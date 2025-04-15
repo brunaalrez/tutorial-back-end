@@ -69,7 +69,25 @@ const livros = [{
         }
     })
 
-    app.
+    app.patch("/livros/:id", (req,res)=>{
+        const id = parseInt(req.params.id);
+        const livros = livros.find(livros =>livros.id === id);
+        if(livros){
+            const{titulo, autor, anoPublicacao, disponivel} = req.body;
+            if(titulo !== undefined){
+                livros.titulo = titulo
+            }
+            if(autor !== undefined){
+                livros.autor = autor
+            }
+            if(anoPublicacao !== undefined){
+                livros.anoPublicacao = anoPublicacao
+            }
+            if(disponivel !== undefined){
+                livros.disponivel = disponivel
+            }
+        }
+    })
 
     app.listen(4000, ()=>{
         console.log("REST API iniciada");
