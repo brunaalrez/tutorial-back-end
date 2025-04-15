@@ -86,6 +86,9 @@ const livros = [{
             if(disponivel !== undefined){
                 livros.disponivel = disponivel
             }
+            res.status(200).json({mensagem: 'Sucesso'});
+        }else{
+            res.status(404).json({mensagem: 'Não encontrado'})
         }
     })
 
