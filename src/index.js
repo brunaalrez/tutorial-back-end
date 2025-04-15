@@ -42,3 +42,18 @@ const livros = [{
         livros.push({id, titulo, autor, anoPublicacao, disponivel});
         res.status(201).location(`/livros/${id}`).send();
     })
+
+    app.put("/livros/:id", (req, res)=>{
+        const id = parseInt(req.params.id);
+        const livros = livros.find(livros =>livros.id === id);
+        if(livros){
+            const{titulo, autor, anoPublicacao, disponivel} = req.body;
+            livros.titulo = titulo;
+            livros.autor = autor;
+            livros.anoPublicacao = anoPublicacao;
+            livros.disponivel = disponivel;
+            res.status(200).send();
+        }else{
+            res.status(404).send();
+        }
+    })
