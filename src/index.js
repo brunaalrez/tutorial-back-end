@@ -35,3 +35,10 @@ const livros = [{
         const livros = livros.find(livros =>livros.id === id);
         res.json(livros);
     })
+
+    app.post("/livros", (req, res)=>{
+        const {titulo, autor, anoPublicacao, disponivel} = req.body;
+        const id = livros.lenght + 1;
+        livros.push({id, titulo, autor, anoPublicacao, disponivel});
+        res.status(201).location(`/livros/${id}`).send();
+    })
