@@ -1,11 +1,28 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 
 const app = express();
+app.use(bodyParser.json());
 
-app.get("/", (req, res)=>{
-    res.send("olá");
-});
-
-app.listen(4000, ()=> {
-    console.log("REST API iniciada");
-});
+const livros = [{
+    id: 1,
+    titulo: "O Senhor dos Anéis",
+    autor: "J.R.R. Tolkien",
+    anoPublicacao: 1954,
+    disponivel: true
+  },
+  {
+    id: 2,
+    titulo: "1984",
+    autor: "George Orwell",
+    anoPublicacao: 1949,
+    disponivel: false
+  },
+  {
+    id: 3,
+    titulo: "A Revolução dos Bichos",
+    autor: "George Orwell",
+    anoPublicacao: 1945,
+    disponivel: true
+  }];
+  
