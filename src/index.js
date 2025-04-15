@@ -58,6 +58,19 @@ const livros = [{
         }
     })
 
+    app.delete("/livros/id:", (req, res)=>{
+        const id = parseInt(req.params.id);
+        const livros = livros.find(livros =>livros.id === id);
+        if(index !== -1){
+            livros.splice(index, 1);
+            res.status(200).json({mensagem: 'Sucesso'});
+        }else{
+            res.status(404).json({mensagem: 'Não encontrado'})
+        }
+    })
+
+    app.
+
     app.listen(4000, ()=>{
         console.log("REST API iniciada");
     })
