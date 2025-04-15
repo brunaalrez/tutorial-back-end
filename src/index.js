@@ -26,8 +26,12 @@ const livros = [{
     disponivel: true
 }];
 
-  app.get("/usuarios", (_req, res) =>{
-    const id = parseInt(requestAnimationFrame.params.id);
-    const livros = livros.find(livros =>livros.id === id);
-    res.json(livros);
-})
+    app.get("/usuarios", (_req, res) =>{
+        res.send(livros);
+    })
+
+    app.get("/usuarios/id:", (req, res) =>{
+        const id = parseInt(req.params.id);
+        const livros = livros.find(livros =>livros.id === id);
+        res.json(livros);
+    })
