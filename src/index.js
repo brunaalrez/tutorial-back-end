@@ -57,3 +57,7 @@ const livros = [{
             res.status(404).send();
         }
     })
+
+    app.listen(4000, ()=>{
+        console.log("REST API iniciada");
+    })
