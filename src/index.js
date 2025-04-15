@@ -24,5 +24,10 @@ const livros = [{
     autor: "George Orwell",
     anoPublicacao: 1945,
     disponivel: true
-  }];
-  
+}];
+
+  app.get("/usuarios", (_req, res) =>{
+    const id = parseInt(requestAnimationFrame.params.id);
+    const livros = livros.find(livros =>livros.id === id);
+    res.json(livros);
+})
