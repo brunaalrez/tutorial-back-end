@@ -1,97 +1,105 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import {PrismaClient} from "./generated/prisma/index.js";
 
 const app = express();
+const port = 4000;
+const prisma = new PrismaClient();
 app.use(bodyParser.json());
 
-const livros = [{
-    id: 1,
-    titulo: "O Senhor dos Anéis",
-    autor: "J.R.R. Tolkien",
-    anoPublicacao: 1954,
-    disponivel: true
-  },
-  {
-    id: 2,
-    titulo: "1984",
-    autor: "George Orwell",
-    anoPublicacao: 1949,
-    disponivel: false
-  },
-  {
-    id: 3,
-    titulo: "A Revolução dos Bichos",
-    autor: "George Orwell",
-    anoPublicacao: 1945,
-    disponivel: true
+app.get("/", (req, res)=>{
+    res.send("Konbanwa");
+});
+
+
+const produtos = [{
+    id: 1, 
+    nome: "Água com gás Pompeia", 
+    preco: 3
+}, 
+{
+    id: 2, 
+    nome: "Batata", 
+    preco: 8
+}, 
+{
+    id: 3, 
+    nome: "Cachorro-quente", 
+    preco: 10
 }];
 
-    app.get("/livros", (_req, res) =>{
-        res.send(livros);
-    })
+app.get("/produtos", async (_req, res)=>{
+    const produtos = await prisma.produto.findMany();
+    res.send(produtos);
+});
 
-    app.get("/livros/id:", (req, res) =>{
-        const id = parseInt(req.params.id);
-        const livros = livros.find(livros =>livros.id === id);
-        res.json(livros);
-    })
+app.get("/produtos/:int", async (req, res)=>{
+    const int = parseInt(req.params.int);
+    const produto = await prisma.produto.findUnique({where: {int}});
+    if(produto === null){
+        res.status(404).send("Produto não encontrado");
+    }else{
+        res.send(produto);
+    }
+})
 
-    app.post("/livros", (req, res)=>{
-        const {titulo, autor, anoPublicacao, disponivel} = req.body;
-        const id = livros.lenght + 1;
-        livros.push({id, titulo, autor, anoPublicacao, disponivel});
-        res.status(201).location(`/livros/${id}`).send();
-    })
+app.post("/produtos", async (req,res) =>{
+    if((req.body.nome === undefined) || (req.body.preco === undefined)){
+        res.status(400).send("Campos Obrigatórios faltantes");
+    }else{
+        const novoProduto = await prisma.produto.create({data: {
+            nome: req.body.nome,
+            preco: req.body.preco
+        }});
+        res.status(201).location(`/produtos/${novoProduto.int}`).send();
+    }
+})
 
-    app.put("/livros/:id", (req, res)=>{
-        const id = parseInt(req.params.id);
-        const livros = livros.find(livros =>livros.id === id);
-        if(livros){
-            const{titulo, autor, anoPublicacao, disponivel} = req.body;
-            livros.titulo = titulo;
-            livros.autor = autor;
-            livros.anoPublicacao = anoPublicacao;
-            livros.disponivel = disponivel;
-            res.status(200).send();
-        }else{
+app.put("/produtos/:int", async (req, res)=> {
+    const int = parseInt(req.params.int);
+    if((req.body.nome === undefined) || (req.body.preco)){
+        res.status(200).send("Campos obrigatórios faltanters");
+    }else{
+        try{
+            await prisma.produto.update({
+                where: {int},
+                data:{
+                    nome: req.body.nome,
+                    preco: req.body.preco
+                }
+            });
             res.status(404).send();
+        }catch(error){
+            res.status(404).send({ mensagem: 'Produto não encontrado' }); 
         }
-    })
+    }
+});
 
-    app.delete("/livros/id:", (req, res)=>{
-        const id = parseInt(req.params.id);
-        const livros = livros.find(livros =>livros.id === id);
-        if(index !== -1){
-            livros.splice(index, 1);
-            res.status(200).json({mensagem: 'Sucesso'});
-        }else{
-            res.status(404).json({mensagem: 'Não encontrado'})
+app.delete("/produtos/:int", async (req, res) =>{
+    const int = parseInt(req.params.int);
+    try{
+        await prisma.produto.delete({
+            where: {int}
+        })
+        res.status(202).send();
+    }catch(error){
+        res.status(404).send({ mensagem: 'Produto não encontrado' }); 
+    }
+});
+
+app.patch("/produtos/:id", (req, res) =>{
+    const id = parseInt(req.params.id);
+    const produto = produtos.find(produto =>produto.id === id);
+    if(produto){
+        const {nome, preco} = req.body;
+        if(nome !== undefined){
+            produto.nome = nome;
         }
-    })
-
-    app.patch("/livros/:id", (req,res)=>{
-        const id = parseInt(req.params.id);
-        const livros = livros.find(livros =>livros.id === id);
-        if(livros){
-            const{titulo, autor, anoPublicacao, disponivel} = req.body;
-            if(titulo !== undefined){
-                livros.titulo = titulo
-            }
-            if(autor !== undefined){
-                livros.autor = autor
-            }
-            if(anoPublicacao !== undefined){
-                livros.anoPublicacao = anoPublicacao
-            }
-            if(disponivel !== undefined){
-                livros.disponivel = disponivel
-            }
-            res.status(200).json({mensagem: 'Sucesso'});
-        }else{
-            res.status(404).json({mensagem: 'Não encontrado'})
+        if(preco !== undefined){
+            produto.preco = preco;
         }
-    })
-
-    app.listen(4000, ()=>{
-        console.log("REST API iniciada");
-    })
+        res.status(200).json({ mensagem: 'sucesso' }); 
+    }else{
+        res.status(404).json({ mensagem: 'não foi' }); 
+    }
+})
